@@ -21,11 +21,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.jetreaderapp.navigation.ReaderScreens
 import kotlinx.coroutines.delay
 
-@Preview
 @Composable
-fun ReaderSplashScreen(navController: NavController = NavController(context = LocalContext.current)) {
+fun ReaderSplashScreen(navController: NavController) {
 
     val scale = remember {
         Animatable(0f)
@@ -35,6 +35,7 @@ fun ReaderSplashScreen(navController: NavController = NavController(context = Lo
             OvershootInterpolator(8f).getInterpolation(it)
         }))
         delay(2000L)
+        navController.navigate(ReaderScreens.LoginScreen.name)
     }
 
     Surface(
@@ -63,8 +64,6 @@ fun ReaderSplashScreen(navController: NavController = NavController(context = Lo
                 style = MaterialTheme.typography.h5,
                 color = Color.LightGray
             )
-
-
         }
     }
 }
