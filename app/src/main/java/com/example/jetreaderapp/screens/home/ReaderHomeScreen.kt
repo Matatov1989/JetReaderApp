@@ -1,9 +1,9 @@
 package com.example.jetreaderapp.screens.home
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavController) {
 
 }

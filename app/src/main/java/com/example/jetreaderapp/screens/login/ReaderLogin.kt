@@ -1,9 +1,9 @@
 package com.example.jetreaderapp.screens.login
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 
 @Composable
-fun ReaderLoginScreen(navController: NavHostController) {
+fun ReaderLoginScreen(navController: NavController) {
 
 }

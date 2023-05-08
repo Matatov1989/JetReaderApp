@@ -1,9 +1,9 @@
 package com.example.jetreaderapp.screens.search
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 
 @Composable
-fun SearchScreen(navController: NavHostController) {
+fun SearchScreen(navController: NavController) {
 
 }
