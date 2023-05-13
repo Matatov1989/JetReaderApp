@@ -19,22 +19,36 @@ class LoginScreenViewModel : ViewModel() {
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
 
-    fun createUserWithEmailAndPassword() {
-
-    }
-
-    fun signInWithEmailAndPassword(email: String, password: String) = viewModelScope.launch {
-        try {
-            auth.signInWithEmailAndPassword(email, password)
+    fun createUserWithEmailAndPassword(email: String, password: String, home: () -> Unit) {
+        if (_loading.value == false) {
+            _loading.value = true
+            auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-
+                        home()
                     } else {
-                        Log.d("auth", "signInWithEmailAndPassword ${task.result}")
+                        Log.d("auth", "createUserWithEmailAndPassword ${task.result}")
                     }
+                    _loading.value = false
                 }
-        } catch (e: Exception) {
-            Log.d("auth", "signInWithEmailAndPassword ${e.message}")
         }
+
+
     }
+
+    fun signInWithEmailAndPassword(email: String, password: String, home: () -> Unit) =
+        viewModelScope.launch {
+            try {
+                auth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            home()
+                        } else {
+                            Log.d("auth", "signInWithEmailAndPassword ${task.result}")
+                        }
+                    }
+            } catch (e: Exception) {
+                Log.d("auth", "signInWithEmailAndPassword ${e.message}")
+            }
+        }
 }

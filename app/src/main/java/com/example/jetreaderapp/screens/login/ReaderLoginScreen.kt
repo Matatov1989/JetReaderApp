@@ -27,9 +27,13 @@ import com.example.jetreaderapp.R
 import com.example.jetreaderapp.components.EmailInput
 import com.example.jetreaderapp.components.PasswordInput
 import com.example.jetreaderapp.components.ReaderLogo
+import com.example.jetreaderapp.navigation.ReaderScreens
 
 @Composable
-fun ReaderLoginScreen(navController: NavController) {
+fun ReaderLoginScreen(
+    navController: NavController,
+    viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     val showLoginForm = rememberSaveable { mutableStateOf(true) }
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -40,11 +44,15 @@ fun ReaderLoginScreen(navController: NavController) {
             ReaderLogo()
             if (showLoginForm.value) {
                 UserForm(loading = false, isCreateAccount = false) { email, password ->
-
+                    viewModel.signInWithEmailAndPassword(email, password) {
+                        navController.navigate(ReaderScreens.ReaderHomeScreen.name)
+                    }
                 }
             } else {
                 UserForm(loading = false, isCreateAccount = true) { email, password ->
-
+                    viewModel.createUserWithEmailAndPassword(email, password) {
+                        navController.navigate(ReaderScreens.ReaderHomeScreen.name)
+                    }
                 }
             }
         }
