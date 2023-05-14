@@ -27,6 +27,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
+import com.example.jetreaderapp.components.FABContent
+import com.example.jetreaderapp.components.ReaderAppBar
+import com.example.jetreaderapp.components.TitleSection
 import com.example.jetreaderapp.model.MBook
 import com.example.jetreaderapp.navigation.ReaderScreens
 import com.google.firebase.auth.FirebaseAuth
@@ -55,7 +59,7 @@ fun HomeContent(navController: NavController = NavController(LocalContext.curren
             FirebaseAuth.getInstance().currentUser?.email?.split("@")?.get(0)
         else
             "N/A"
-    Column(Modifier.padding(2.dp), verticalArrangement = Arrangement.SpaceEvenly) {
+    Column(Modifier.padding(2.dp), verticalArrangement = Arrangement.Top) {
         Row(modifier = Modifier.align(alignment = Alignment.Start)) {
             TitleSection(label = "You reading \n activity right now...")
             Spacer(modifier = Modifier.fillMaxWidth(0.7f))
@@ -83,79 +87,59 @@ fun HomeContent(navController: NavController = NavController(LocalContext.curren
             }
         }
     }
-
 }
 
+@Preview
 @Composable
-fun ReaderAppBar(title: String, showProfile: Boolean = true, navController: NavController) {
-    TopAppBar(title = {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (showProfile) {
+fun ListCard(
+    book: MBook = MBook(
+        "AWS",
+        "Running",
+        "I am",
+        "Hello world!!",
+    ), onPressDetails: (String) -> Unit = {}
+) {
+
+    val context = LocalContext.current
+    val displayMetrics = context.resources.displayMetrics
+    val screenWidth = displayMetrics.widthPixels / displayMetrics.density
+    val spacing = 10.dp
+
+    Card(
+        shape = RoundedCornerShape(29.dp),
+        backgroundColor = Color.White,
+        elevation = 6.dp,
+        modifier = Modifier
+            .padding(16.dp)
+            .height(242.dp)
+            .width(202.dp)
+            .clickable { onPressDetails.invoke(book.title.toString()) }
+    ) {
+        Column(
+            modifier = Modifier.width(screenWidth.dp - (spacing * 2)),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(horizontalArrangement = Arrangement.Center) {
                 Image(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Logo Icon",
+                    painter = rememberImagePainter(data = ""),
+                    contentDescription = "",
                     modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .scale(0.9f)
+                        .height(140.dp)
+                        .width(100.dp)
+                        .padding(4.dp)
                 )
+                Spacer(modifier = Modifier.width(50.dp))
+                Column() {
+
+                }
+
             }
-            Text(
-                text = title,
-                color = Color.Red.copy(alpha = 0.7f),
-                style = TextStyle(fontWeight = FontWeight.Bold),
-                fontSize = 20.sp
-            )
-            Spacer(modifier = Modifier.width(150.dp))
-        }
-    }, actions = {
-        IconButton(onClick = {
-            FirebaseAuth.getInstance().signOut().run {
-                navController.navigate(ReaderScreens.LoginScreen.name)
-            }
-        }) {
-            Icon(
-                imageVector = Icons.Filled.Logout,
-                contentDescription = "Logout",
-//                tint = Color.Green.copy(alpha = 0.4f)
-            )
-        }
-    }, backgroundColor = Color.Transparent, elevation = 0.dp)
-}
-
-@Composable
-fun TitleSection(modifier: Modifier = Modifier, label: String) {
-    Surface(modifier = modifier.padding(start = 5.dp, top = 1.dp)) {
-        Column {
-            Text(
-                text = label,
-                fontSize = 19.sp,
-                fontStyle = FontStyle.Normal,
-                textAlign = TextAlign.Center
-            )
 
         }
-
     }
-
 }
 
 @Composable
 fun ReadingRightNowArea(books: List<MBook>, navController: NavController) {
 
-}
-
-@Composable
-fun FABContent(onTap: () -> Unit) {
-    FloatingActionButton(
-        onClick = { onTap() },
-        shape = RoundedCornerShape(50.dp),
-        backgroundColor = Color(0xFF92CBDF)
-    ) {
-        Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = "Add a book",
-            tint = Color.White
-        )
-
-    }
 }
