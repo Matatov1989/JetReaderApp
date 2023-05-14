@@ -3,12 +3,15 @@ package com.example.jetreaderapp.screens.home
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.jetreaderapp.navigation.ReaderScreens
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -57,8 +63,17 @@ fun ReaderAppBar(title: String, showProfile: Boolean = true, navController: NavC
                 style = TextStyle(fontWeight = FontWeight.Bold),
                 fontSize = 20.sp
             )
+            Spacer(modifier = Modifier.width(150.dp))
         }
-    }, actions = {}, backgroundColor = Color.Transparent, elevation = 0.dp)
+    }, actions = {
+        IconButton(onClick = {
+            FirebaseAuth.getInstance().signOut().run {
+                navController.navigate(ReaderScreens.LoginScreen.name)
+            }
+        }) {
+            Icon(imageVector = Icons.Filled.Logout, contentDescription = "Logout")
+        }
+    }, backgroundColor = Color.Transparent, elevation = 0.dp)
 }
 
 @Composable
