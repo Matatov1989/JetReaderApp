@@ -34,12 +34,10 @@ fun ReaderSplashScreen(navController: NavController) {
             OvershootInterpolator(8f).getInterpolation(it)
         }))
         delay(2000L)
-//        if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty())
-//            navController.navigate(ReaderScreens.LoginScreen.name)
-//        else
-//            navController.navigate(ReaderScreens.ReaderHomeScreen.name)
-
-        navController.navigate(ReaderScreens.LoginScreen.name)
+        if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty())
+            navController.navigate(ReaderScreens.LoginScreen.name)
+        else
+            navController.navigate(ReaderScreens.ReaderHomeScreen.name)
     }
 
     Surface(

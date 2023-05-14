@@ -2,10 +2,12 @@ package com.example.jetreaderapp.screens.home
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Logout
@@ -20,6 +22,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,13 +50,40 @@ fun HomeScreen(navController: NavController) {
 @Preview
 @Composable
 fun HomeContent(navController: NavController = NavController(LocalContext.current)) {
+    val currentUserName =
+        if (!FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty())
+            FirebaseAuth.getInstance().currentUser?.email?.split("@")?.get(0)
+        else
+            "N/A"
     Column(Modifier.padding(2.dp), verticalArrangement = Arrangement.SpaceEvenly) {
         Row(modifier = Modifier.align(alignment = Alignment.Start)) {
             TitleSection(label = "You reading \n activity right now...")
-            
+            Spacer(modifier = Modifier.fillMaxWidth(0.7f))
+            Column {
+                Icon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = "Profile",
+                    modifier = Modifier
+                        .clickable {
+                            navController.navigate(ReaderScreens.ReaderStatsScreen.name)
+                        }
+                        .size(45.dp),
+                    tint = MaterialTheme.colors.secondaryVariant
+                )
+                Text(
+                    text = currentUserName.toString(),
+                    modifier = Modifier.padding(2.dp),
+                    style = MaterialTheme.typography.overline,
+                    color = Color.Red,
+                    fontSize = 15.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Clip
+                )
+                Divider()
+            }
         }
     }
-    
+
 }
 
 @Composable
@@ -66,7 +96,7 @@ fun ReaderAppBar(title: String, showProfile: Boolean = true, navController: NavC
                     contentDescription = "Logo Icon",
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
-                        .scale(0.1f)
+                        .scale(0.9f)
                 )
             }
             Text(
