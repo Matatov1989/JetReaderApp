@@ -12,8 +12,10 @@ import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -78,6 +80,37 @@ fun HomeContent(navController: NavController = NavController(LocalContext.curren
                 )
                 Divider()
             }
+        }
+        ListCard()
+    }
+}
+
+
+@Preview
+@Composable
+fun RoundedButton(
+    label: String = "Reading",
+    radius: Int = 29,
+    onPress: () -> Unit = {}
+) {
+    Surface(
+        modifier = Modifier.clip(
+            RoundedCornerShape(
+                bottomEndPercent = radius,
+                topStartPercent = radius
+            )
+        ),
+        color = Color(0xFF92CBDF)
+    ) {
+        Column(
+            modifier = Modifier
+                .width(90.dp)
+                .heightIn(40.dp)
+                .clickable { onPress.invoke() },
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = label, style = TextStyle(color = Color.White, fontSize = 15.sp))
         }
     }
 }
@@ -147,6 +180,10 @@ fun ListCard(
                 modifier = Modifier.padding(4.dp),
                 style = MaterialTheme.typography.caption
             )
+        }
+        Row(horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.Bottom) {
+            RoundedButton(label = "Reading", radius = 70)
+
         }
     }
 }
