@@ -1,9 +1,12 @@
 package com.example.jetreaderapp.screens.home
 
 import android.annotation.SuppressLint
+import android.widget.HorizontalScrollView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -23,13 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.jetreaderapp.components.FABContent
-import com.example.jetreaderapp.components.ReaderAppBar
-import com.example.jetreaderapp.components.TitleSection
+import com.example.jetreaderapp.components.*
 import com.example.jetreaderapp.model.MBook
 import com.example.jetreaderapp.navigation.ReaderScreens
 import com.google.firebase.auth.FirebaseAuth
-
+//https://www.googleapis.com/books/v1/volumes?q=android
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -49,6 +50,13 @@ fun HomeScreen(navController: NavController) {
 @Preview
 @Composable
 fun HomeContent(navController: NavController = NavController(LocalContext.current)) {
+    val listBooks = listOf(
+        MBook(id = "dfdf", title = "Hello Again", author = "All", notes = null),
+        MBook(id = "kl", title = "Again", author = "All", notes = null),
+        MBook(id = "hkji", title = "Hello lol", author = "All gfhfgh", notes = null),
+        MBook(id = "ws", title = "fff Again", author = "All", notes = null),
+        MBook(id = "ju", title = "Hello g", author = "All", notes = null),
+    )
     val currentUserName =
         if (!FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty())
             FirebaseAuth.getInstance().currentUser?.email?.split("@")?.get(0)
@@ -81,131 +89,33 @@ fun HomeContent(navController: NavController = NavController(LocalContext.curren
                 Divider()
             }
         }
-        ListCard()
+        ReadingRightNowArea(books = listOf(), navController = navController)
+
+        TitleSection(label = "Reading List")
+
+        BookListArea(listOfBooks = listBooks, navController = navController)
     }
 }
 
-
-@Preview
 @Composable
-fun RoundedButton(
-    label: String = "Reading",
-    radius: Int = 29,
-    onPress: () -> Unit = {}
-) {
-    Surface(
-        modifier = Modifier.clip(
-            RoundedCornerShape(
-                bottomEndPercent = radius,
-                topStartPercent = radius
-            )
-        ),
-        color = Color(0xFF92CBDF)
-    ) {
-        Column(
-            modifier = Modifier
-                .width(90.dp)
-                .heightIn(40.dp)
-                .clickable { onPress.invoke() },
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = label, style = TextStyle(color = Color.White, fontSize = 15.sp))
-        }
+fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
+    HorizontalScrollableComponent(listOfBooks) {
+
     }
 }
 
-@Preview
 @Composable
-fun ListCard(
-    book: MBook = MBook(
-        "AWS",
-        "Running",
-        "I am",
-        "Hello world!!",
-    ), onPressDetails: (String) -> Unit = {}
-) {
+fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed: (String) -> Unit) {
+    val scrollState = rememberScrollState()
 
-    val context = LocalContext.current
-    val displayMetrics = context.resources.displayMetrics
-    val screenWidth = displayMetrics.widthPixels / displayMetrics.density
-    val spacing = 10.dp
-
-    Card(
-        shape = RoundedCornerShape(29.dp),
-        backgroundColor = Color.White,
-        elevation = 6.dp,
-        modifier = Modifier
-            .padding(16.dp)
-            .height(242.dp)
-            .width(202.dp)
-            .clickable { onPressDetails.invoke(book.title.toString()) }
-    ) {
-        Column(
-            modifier = Modifier.width(screenWidth.dp - (spacing * 2)),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Row(horizontalArrangement = Arrangement.Center) {
-                Image(
-                    painter = rememberImagePainter(data = "http://books.google.com/books/content?id=M7ngCAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .height(140.dp)
-                        .width(100.dp)
-                        .padding(4.dp)
-                )
-                Spacer(modifier = Modifier.width(50.dp))
-                Column(
-                    modifier = Modifier.padding(top = 25.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.FavoriteBorder,
-                        contentDescription = "Fav Icon",
-                        modifier = Modifier.padding(1.dp)
-                    )
-                    BookRating(score = 3.5)
-                }
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .heightIn(280.dp)
+        .horizontalScroll(scrollState)) {
+        for (book in listOfBooks) {
+            ListCard(book) {
+                onCardPressed(it)
             }
-            Text(
-                text = "Book title",
-                modifier = Modifier.padding(4.dp),
-                fontWeight = FontWeight.Bold,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = "Author: All...",
-                modifier = Modifier.padding(4.dp),
-                style = MaterialTheme.typography.caption
-            )
-        }
-        Row(horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.Bottom) {
-            RoundedButton(label = "Reading", radius = 70)
-
-        }
-    }
-}
-
-@Composable
-fun BookRating(score: Double = 4.5) {
-    Surface(
-        modifier = Modifier
-            .height(70.dp)
-            .padding(4.dp),
-        shape = RoundedCornerShape(56.dp),
-        elevation = 6.dp,
-        color = Color.White
-    ) {
-        Column(modifier = Modifier.padding(4.dp)) {
-            Icon(
-                imageVector = Icons.Filled.StarBorder,
-                contentDescription = "Star",
-                modifier = Modifier.padding(3.dp)
-            )
-            Text(text = score.toString(), style = MaterialTheme.typography.subtitle1)
-
         }
 
     }
@@ -214,5 +124,5 @@ fun BookRating(score: Double = 4.5) {
 
 @Composable
 fun ReadingRightNowArea(books: List<MBook>, navController: NavController) {
-
+    ListCard()
 }
