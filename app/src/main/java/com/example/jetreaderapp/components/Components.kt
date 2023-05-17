@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -160,7 +161,13 @@ fun TitleSection(modifier: Modifier = Modifier, label: String) {
 }
 
 @Composable
-fun ReaderAppBar(title: String, showProfile: Boolean = true, navController: NavController) {
+fun ReaderAppBar(
+    title: String,
+    icon: ImageVector? = null,
+    showProfile: Boolean = true,
+    navController: NavController,
+    onBackArrowClicked: () -> Unit = {}
+) {
     TopAppBar(title = {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (showProfile) {
@@ -172,13 +179,25 @@ fun ReaderAppBar(title: String, showProfile: Boolean = true, navController: NavC
                         .scale(0.9f)
                 )
             }
+
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = "arrow back",
+                    tint = Color.Red.copy(alpha = 0.7F),
+                    modifier = Modifier.clickable { onBackArrowClicked.invoke() }
+                )
+            }
+
+            Spacer(modifier = Modifier.width(40.dp))
+
             Text(
                 text = title,
                 color = Color.Red.copy(alpha = 0.7f),
                 style = TextStyle(fontWeight = FontWeight.Bold),
                 fontSize = 20.sp
             )
-            Spacer(modifier = Modifier.width(150.dp))
+
         }
     }, actions = {
         IconButton(onClick = {
@@ -186,11 +205,17 @@ fun ReaderAppBar(title: String, showProfile: Boolean = true, navController: NavC
                 navController.navigate(ReaderScreens.LoginScreen.name)
             }
         }) {
-            Icon(
-                imageVector = Icons.Filled.Logout,
-                contentDescription = "Logout",
+            if (showProfile) {
+                Row() {
+                    Icon(
+                        imageVector = Icons.Filled.Logout,
+                        contentDescription = "Logout",
 //                tint = Color.Green.copy(alpha = 0.4f)
-            )
+                    )
+                }
+            } else {
+                Box {}
+            }
         }
     }, backgroundColor = Color.Transparent, elevation = 0.dp)
 }
