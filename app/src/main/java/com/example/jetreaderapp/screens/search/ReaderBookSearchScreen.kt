@@ -62,14 +62,21 @@ fun SearchScreen(
 
                 }
                 Spacer(modifier = Modifier.height(13.dp))
-                BookList(navController)
+                BookList(navController, viewModel)
             }
         }
     }
 }
 
 @Composable
-fun BookList(navController: NavController) {
+fun BookList(navController: NavController, viewModel: BookSearchViewModel) {
+
+    if (viewModel.listOfBooks.value.loading == true) {
+        CircularProgressIndicator()
+    } else {
+
+    }
+
     val listBooks = listOf(
         MBook(id = "dfdf", title = "Hello Again", author = "All", notes = null),
         MBook(id = "kl", title = "Again", author = "All", notes = null),
