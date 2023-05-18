@@ -23,9 +23,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.jetreaderapp.components.ReaderAppBar
+import com.example.jetreaderapp.components.RoundedButton
 import com.example.jetreaderapp.data.Resource
 import com.example.jetreaderapp.model.Item
+import com.example.jetreaderapp.model.MBook
 import com.example.jetreaderapp.navigation.ReaderScreens
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "ProduceStateDoesNotAssignValue")
@@ -118,7 +121,9 @@ fun ShowBookDetails(bookInfo: Resource<Item>, navController: NavController) {
     val localDims = LocalContext.current.resources.displayMetrics
 
     Surface(
-        modifier = Modifier.height(localDims.heightPixels.dp.times(0.09F)).padding(4.dp),
+        modifier = Modifier
+            .height(localDims.heightPixels.dp.times(0.09F))
+            .padding(4.dp),
         shape = RectangleShape,
         border = BorderStroke(1.dp, Color.DarkGray)
     ) {
@@ -129,5 +134,27 @@ fun ShowBookDetails(bookInfo: Resource<Item>, navController: NavController) {
         }
     }
 
+    // Buttons
+    Row(modifier = Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.SpaceAround) {
+        RoundedButton(
+            label = "Save"
+        ) {
+            // save this book to the firestore database
+            val book = MBook(
 
+            )
+            saveToFirebase(book)
+
+        }
+        Spacer(modifier = Modifier.width(25.dp))
+        RoundedButton(
+            label = "Cancel"
+        ) {
+           navController.popBackStack()
+        }
+    }
+}
+
+fun saveToFirebase(book: MBook) {
+    val db = FirebaseFirestore.getInstance()
 }
