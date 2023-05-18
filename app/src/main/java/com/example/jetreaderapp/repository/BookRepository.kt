@@ -1,39 +1,35 @@
 package com.example.jetreaderapp.repository
 
 import com.example.jetreaderapp.data.DataOrException
+import com.example.jetreaderapp.data.Resource
 import com.example.jetreaderapp.model.Item
 import com.example.jetreaderapp.network.BooksApi
 import javax.inject.Inject
 
 class BookRepository @Inject constructor(private val api: BooksApi) {
 
-    private val dataOrException = DataOrException<List<Item>, Boolean, Exception>()
-
     private val bookInfoDataOrException = DataOrException<Item, Boolean, Exception>()
 
-    suspend fun getBooks(searchQuery: String): DataOrException<List<Item>, Boolean, Exception> {
-        try {
-            dataOrException.loading = true
-            dataOrException.data = api.getAllBooks(searchQuery).items
-            if (dataOrException.data!!.isNotEmpty()) dataOrException.loading = false
+    suspend fun getBooks(searchQuery: String): Resource<List<Item>> {
+        return try {
+            Resource.Loading(data = true)
+            val itemList = api.getAllBooks(searchQuery).items
+            if (itemList.isNotEmpty())
+                Resource.Loading(data = false)
+            Resource.Success(data = itemList)
         } catch (e: Exception) {
-            dataOrException.e = e
+            Resource.Error(message = e.message.toString())
         }
-        return dataOrException
     }
 
-    suspend fun getBookInfo(bookId: String): DataOrException<Item, Boolean, Exception> {
+    suspend fun getBookInfo(bookId: String): Resource<Item> {
         val response = try {
-            bookInfoDataOrException.loading = true
-            bookInfoDataOrException.data = api.getBookInfo(bookId = bookId)
-            if (bookInfoDataOrException.data.toString().isNotEmpty()) {
-                bookInfoDataOrException.loading = false
-            } else {
-
-            }
+            Resource.Loading(data = true)
+            api.getBookInfo(bookId)
         } catch (e: Exception) {
-            bookInfoDataOrException.e = e
+            return Resource.Error(message = "An error occured ${e.message.toString()}")
         }
-        return bookInfoDataOrException
+        Resource.Loading(data = false)
+        return Resource.Success(data = response)
     }
 }
