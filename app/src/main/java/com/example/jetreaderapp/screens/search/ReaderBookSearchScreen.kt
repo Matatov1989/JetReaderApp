@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.jetreaderapp.components.InputField
@@ -30,9 +31,11 @@ import com.example.jetreaderapp.components.ReaderAppBar
 import com.example.jetreaderapp.model.MBook
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@Preview
 @Composable
-fun SearchScreen(navController: NavController = NavController(LocalContext.current)) {
+fun SearchScreen(
+    navController: NavController,
+    viewModel: BookSearchViewModel = hiltViewModel()
+) {
     Scaffold(
         topBar = {
             ReaderAppBar(
@@ -51,8 +54,11 @@ fun SearchScreen(navController: NavController = NavController(LocalContext.curre
                 SearchForm(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
+                        .padding(16.dp),
+                    viewModel
+                ) { query ->
+                    viewModel.searchBooks(query)
+
 
                 }
                 Spacer(modifier = Modifier.height(13.dp))
@@ -97,7 +103,10 @@ fun BookRow(book: MBook, navController: NavController) {
             Image(
                 painter = rememberImagePainter(data = imageUrl),
                 contentDescription = "book image",
-                modifier = Modifier.width(80.dp).fillMaxHeight().padding(end = 4.dp)
+                modifier = Modifier
+                    .width(80.dp)
+                    .fillMaxHeight()
+                    .padding(end = 4.dp)
             )
             Column() {
                 Text(text = book.title.toString(), overflow = TextOverflow.Ellipsis)
@@ -119,6 +128,7 @@ fun BookRow(book: MBook, navController: NavController) {
 @Composable
 fun SearchForm(
     modifier: Modifier = Modifier,
+    viewModel: BookSearchViewModel,
     loading: Boolean = false,
     hint: String = "Search",
     onSearch: (String) -> Unit = {}
