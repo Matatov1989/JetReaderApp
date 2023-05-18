@@ -69,7 +69,13 @@ fun SearchScreen(
 @Composable
 fun BookList(navController: NavController, viewModel: BookSearchViewModel = hiltViewModel()) {
     if (viewModel.isLoading) {
-        LinearProgressIndicator()
+        Row(modifier = Modifier.padding(2.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+            ) {
+            LinearProgressIndicator()
+            Text(text = "Loading...")
+        }
     } else {
         val listBooks = viewModel.list
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
