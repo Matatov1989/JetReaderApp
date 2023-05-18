@@ -20,6 +20,7 @@ import javax.inject.Inject
 class BookSearchViewModel @Inject constructor(private val repository: BookRepository) :
     ViewModel() {
     var list: List<Item> by mutableStateOf(listOf())
+    var isLoading: Boolean by mutableStateOf(true)
 
     init {
         loadBooks()
@@ -31,6 +32,7 @@ class BookSearchViewModel @Inject constructor(private val repository: BookReposi
 
     fun searchBooks(query: String) {
         viewModelScope.launch(Dispatchers.Default) {
+
             if (query.isEmpty()) {
                 return@launch
             }
@@ -38,15 +40,18 @@ class BookSearchViewModel @Inject constructor(private val repository: BookReposi
                 when (val response = repository.getBooks(query)) {
                     is Resource.Success -> {
                         list = response.data!!
+                        if (list.isNotEmpty()) isLoading = false
                     }
                     is Resource.Error -> {
+                        isLoading = false
                         Log.d("Network", "search: Failed getting books")
                     }
                     else -> {
-
+                        isLoading = false
                     }
                 }
             } catch (e: Exception) {
+                isLoading = false
                 Log.d("Network", "search: ${e.message.toString()}")
             }
         }

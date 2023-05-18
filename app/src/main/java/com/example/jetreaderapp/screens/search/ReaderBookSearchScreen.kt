@@ -27,7 +27,6 @@ import coil.compose.rememberImagePainter
 import com.example.jetreaderapp.components.InputField
 import com.example.jetreaderapp.components.ReaderAppBar
 import com.example.jetreaderapp.model.Item
-import com.example.jetreaderapp.model.MBook
 import com.example.jetreaderapp.navigation.ReaderScreens
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -68,21 +67,15 @@ fun SearchScreen(
 
 @Composable
 fun BookList(navController: NavController, viewModel: BookSearchViewModel = hiltViewModel()) {
+    if (viewModel.isLoading) {
+        LinearProgressIndicator()
+    } else {
+        val listBooks = viewModel.list
+        LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
+            items(items = listBooks) { book ->
+                BookRow(book, navController)
 
-    val listBooks = viewModel.list
-
-//    val listBooks = listOf(
-//        MBook(id = "dfdf", title = "Hello Again", author = "All", notes = null),
-//        MBook(id = "kl", title = "Again", author = "All", notes = null),
-//        MBook(id = "hkji", title = "Hello lol", author = "All gfhfgh", notes = null),
-//        MBook(id = "ws", title = "fff Again", author = "All", notes = null),
-//        MBook(id = "ju", title = "Hello g", author = "All", notes = null),
-//    )
-
-    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
-        items(items = listBooks) { book ->
-            BookRow(book, navController)
-
+            }
         }
     }
 }
