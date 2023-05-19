@@ -45,19 +45,12 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
     var listOfBooks = emptyList<MBook>()
     val currentUser = FirebaseAuth.getInstance().currentUser
 
-    if (viewModel.data.value.data.isNullOrEmpty()) {
+    if (!viewModel.data.value.data.isNullOrEmpty()) {
         listOfBooks = viewModel.data.value.data?.toList()!!.filter { mBook ->
             mBook.userId == currentUser?.uid
         }
     }
 
-//    val listBooks = listOf(
-//        MBook(id = "dfdf", title = "Hello Again", author = "All", notes = null),
-//        MBook(id = "kl", title = "Again", author = "All", notes = null),
-//        MBook(id = "hkji", title = "Hello lol", author = "All gfhfgh", notes = null),
-//        MBook(id = "ws", title = "fff Again", author = "All", notes = null),
-//        MBook(id = "ju", title = "Hello g", author = "All", notes = null),
-//    )
     val currentUserName =
         if (!FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty())
             FirebaseAuth.getInstance().currentUser?.email?.split("@")?.get(0)
