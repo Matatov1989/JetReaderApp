@@ -30,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.jetreaderapp.components.InputField
+import com.example.jetreaderapp.components.RatingBar
 import com.example.jetreaderapp.components.ReaderAppBar
 import com.example.jetreaderapp.data.DataOrException
 import com.example.jetreaderapp.model.MBook
@@ -107,6 +108,7 @@ fun ShowSimpleForm(book: MBook, navController: NavController) {
     val notesText = remember { mutableStateOf("") }
     val isStartReading = remember { mutableStateOf(false) }
     val isFinishedReading = remember { mutableStateOf(false) }
+    val ratingVal = remember { mutableStateOf(0) }
 
     SimpleForm(
         defaultValue =
@@ -155,6 +157,14 @@ fun ShowSimpleForm(book: MBook, navController: NavController) {
             }
         }
     }
+    
+    Text(text = "Rating", modifier = Modifier.padding(3.dp))
+    book.rating?.toInt().let {
+        RatingBar(reting = it!!) { rating ->
+            ratingVal.value = rating
+        }
+    }
+
 }
 
 @ExperimentalComposeUiApi
