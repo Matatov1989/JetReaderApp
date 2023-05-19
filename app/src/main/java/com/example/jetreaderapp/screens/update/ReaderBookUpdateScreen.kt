@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -99,19 +100,60 @@ fun BookUpdateScreen(
         }
     }
 }
+
 @ExperimentalComposeUiApi
 @Composable
 fun ShowSimpleForm(book: MBook, navController: NavController) {
     val notesText = remember { mutableStateOf("") }
+    val isStartReading = remember { mutableStateOf(false) }
+    val isFinishedReading = remember { mutableStateOf(false) }
 
     SimpleForm(
         defaultValue =
         if (book.notes.toString().isNotEmpty()) book.notes.toString()
         else "No thoughts available.",
-    ){ note ->
+    ) { note ->
         notesText.value = note
+    }
 
+    Row(
+        modifier = Modifier.padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        TextButton(
+            onClick = {
+                isStartReading.value = true
+            },
+            enabled = book.startedReading == null
+        ) {
 
+            if (book.startedReading == null) {
+                if (!isStartReading.value) {
+                    Text(text = "Started Reading")
+                } else {
+                    Text(
+                        text = "Started Reading",
+                        modifier = Modifier.alpha(0.6f),
+                        color = Color.Red.copy(alpha = 0.5f)
+                    )
+                }
+            } else {
+                Text(text = "Started on: ${book.startedReading}")
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        TextButton(onClick = { isFinishedReading.value = true }, enabled = book.finishedReading == null) {
+            if (book.finishedReading == null) {
+                if (!isFinishedReading.value) {
+                    Text(text = "Mark as Read")
+                } else {
+                    Text(text = "Finished Reading!")
+                }
+            } else {
+                Text(text = "Finished on: ${book.finishedReading}")
+            }
+        }
     }
 }
 
@@ -121,7 +163,8 @@ fun SimpleForm(
     modifier: Modifier = Modifier,
     loading: Boolean = false,
     defaultValue: String = "Great Book!",
-    onSearch: (String) -> Unit) {
+    onSearch: (String) -> Unit
+) {
 
     Column() {
         val textFieldValue = rememberSaveable { mutableStateOf((defaultValue)) }
