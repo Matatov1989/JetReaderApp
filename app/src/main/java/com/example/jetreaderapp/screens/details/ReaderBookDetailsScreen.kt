@@ -155,7 +155,7 @@ fun ShowBookDetails(bookInfo: Resource<Item>, navController: NavController) {
                 googleBookId = googleBookId,
                 userId = FirebaseAuth.getInstance().currentUser?.uid.toString()
             )
-            SaveToFirebase(book, navController)
+            saveToFirebase(book, navController)
 
         }
         Spacer(modifier = Modifier.width(25.dp))
@@ -167,7 +167,7 @@ fun ShowBookDetails(bookInfo: Resource<Item>, navController: NavController) {
     }
 }
 
-fun SaveToFirebase(book: MBook, navController: NavController) {
+fun saveToFirebase(book: MBook, navController: NavController) {
     val db = FirebaseFirestore.getInstance()
     val dbCollection = db.collection("books")
 
