@@ -1,31 +1,24 @@
 package com.example.jetreaderapp.screens.home
 
 import android.annotation.SuppressLint
-import android.widget.HorizontalScrollView
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
 import com.example.jetreaderapp.components.*
 import com.example.jetreaderapp.model.MBook
 import com.example.jetreaderapp.navigation.ReaderScreens
@@ -33,7 +26,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hiltViewModel()) {
     Scaffold(topBar = {
         ReaderAppBar(title = "Reader", navController = navController)
     }, floatingActionButton = {
@@ -42,21 +35,29 @@ fun HomeScreen(navController: NavController) {
         }
     }) {
         Surface(modifier = Modifier.fillMaxSize()) {
-            HomeContent(navController)
+            HomeContent(navController, viewModel)
         }
     }
 }
 
-@Preview
 @Composable
-fun HomeContent(navController: NavController = NavController(LocalContext.current)) {
-    val listBooks = listOf(
-        MBook(id = "dfdf", title = "Hello Again", author = "All", notes = null),
-        MBook(id = "kl", title = "Again", author = "All", notes = null),
-        MBook(id = "hkji", title = "Hello lol", author = "All gfhfgh", notes = null),
-        MBook(id = "ws", title = "fff Again", author = "All", notes = null),
-        MBook(id = "ju", title = "Hello g", author = "All", notes = null),
-    )
+fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
+    var listOfBooks = emptyList<MBook>()
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    if (viewModel.data.value.data.isNullOrEmpty()) {
+        listOfBooks = viewModel.data.value.data?.toList()!!.filter { mBook ->
+            mBook.userId == currentUser?.uid
+        }
+    }
+
+//    val listBooks = listOf(
+//        MBook(id = "dfdf", title = "Hello Again", author = "All", notes = null),
+//        MBook(id = "kl", title = "Again", author = "All", notes = null),
+//        MBook(id = "hkji", title = "Hello lol", author = "All gfhfgh", notes = null),
+//        MBook(id = "ws", title = "fff Again", author = "All", notes = null),
+//        MBook(id = "ju", title = "Hello g", author = "All", notes = null),
+//    )
     val currentUserName =
         if (!FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty())
             FirebaseAuth.getInstance().currentUser?.email?.split("@")?.get(0)
@@ -93,7 +94,7 @@ fun HomeContent(navController: NavController = NavController(LocalContext.curren
 
         TitleSection(label = "Reading List")
 
-        BookListArea(listOfBooks = listBooks, navController = navController)
+        BookListArea(listOfBooks = listOfBooks, navController = navController)
     }
 }
 
