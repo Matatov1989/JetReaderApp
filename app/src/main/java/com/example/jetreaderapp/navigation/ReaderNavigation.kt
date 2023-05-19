@@ -30,7 +30,7 @@ fun ReaderNavigation() {
         }
 
         val detailName = ReaderScreens.DetailScreen.name
-        composable("$detailName/{bookIKd}", arguments = listOf(navArgument("BookId") {
+        composable("$detailName/{bookId}", arguments = listOf(navArgument("bookId") {
             type = NavType.StringType
         })) { backStackEntry ->
             backStackEntry.arguments?.getString("bookId").let {

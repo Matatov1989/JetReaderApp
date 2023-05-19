@@ -1,6 +1,7 @@
 package com.example.jetreaderapp.screens.details
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -28,6 +29,7 @@ import com.example.jetreaderapp.data.Resource
 import com.example.jetreaderapp.model.Item
 import com.example.jetreaderapp.model.MBook
 import com.example.jetreaderapp.navigation.ReaderScreens
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 
@@ -141,9 +143,19 @@ fun ShowBookDetails(bookInfo: Resource<Item>, navController: NavController) {
         ) {
             // save this book to the firestore database
             val book = MBook(
-
+                title = bookData.title,
+                author = bookData.authors.toString(),
+                description = bookData.description,
+                categories = bookData.categories.toString(),
+                notes = "",
+                photoUrl = bookData.imageLinks.thumbnail,
+                publishedDate = bookData.publishedDate,
+                pageCount = bookData.pageCount.toString(),
+                rating = 0.0,
+                googleBookId = googleBookId,
+                userId = FirebaseAuth.getInstance().currentUser?.uid.toString()
             )
-            saveToFirebase(book)
+            SaveToFirebase(book, navController)
 
         }
         Spacer(modifier = Modifier.width(25.dp))
@@ -155,6 +167,22 @@ fun ShowBookDetails(bookInfo: Resource<Item>, navController: NavController) {
     }
 }
 
-fun saveToFirebase(book: MBook) {
+fun SaveToFirebase(book: MBook, navController: NavController) {
     val db = FirebaseFirestore.getInstance()
+    val dbCollection = db.collection("books")
+
+    if (book.toString().isNotEmpty()) {
+        dbCollection.add(book).addOnSuccessListener { documentRef ->
+            val docId = documentRef.id
+            dbCollection.document(docId)
+                .update(hashMapOf("id" to docId) as Map<String, Any>)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        navController.popBackStack()
+                    }
+                }.addOnFailureListener {
+                    Log.w("Error", "Save to firebase: Error updating doc", it)
+                }
+        }
+    }
 }
