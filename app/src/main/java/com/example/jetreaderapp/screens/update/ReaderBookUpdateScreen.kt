@@ -15,10 +15,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -28,12 +25,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import com.example.jetreaderapp.R
 import com.example.jetreaderapp.components.InputField
 import com.example.jetreaderapp.components.RatingBar
 import com.example.jetreaderapp.components.ReaderAppBar
@@ -215,9 +214,66 @@ fun ShowSimpleForm(book: MBook, navController: NavController) {
             }
         }
         Spacer(modifier = Modifier.width(100.dp))
-        RoundedButton(label = "Delete")
+
+        val openDialog = remember {
+            mutableStateOf(false)
+        }
+
+        if (openDialog.value) {
+            ShowAlertDialog(
+                message = stringResource(id = R.string.sure) + "\n" + stringResource(id = R.string.action),
+                openDialog
+            ) {
+                FirebaseFirestore.getInstance()
+                    .collection("books")
+                    .document(book.id!!)
+                    .delete()
+                    .addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            openDialog.value = false
+//                            navController.popBackStack()
+                            navController.navigate(ReaderScreens.ReaderHomeScreen.name)
+                        }
+                    }
+            }
+        }
+
+        RoundedButton(label = "Delete") {
+            openDialog.value = true
+        }
     }
 
+}
+
+@Composable
+fun ShowAlertDialog(
+    message: String,
+    openDialog: MutableState<Boolean>,
+    onYesPressed: () -> Unit
+) {
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                openDialog.value = false
+            },
+            title = { Text(text = "Delete Book") },
+            text = { Text(text = message) },
+            buttons = {
+                Row(
+                    modifier = Modifier.padding(all = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextButton(onClick = { onYesPressed.invoke() }) {
+                        Text(text = "Yes")
+                    }
+
+                    TextButton(onClick = { openDialog.value = false }) {
+                        Text(text = "No")
+                    }
+                }
+            }
+        )
+    }
 }
 
 fun showToast(context: Context, msg: String) {
