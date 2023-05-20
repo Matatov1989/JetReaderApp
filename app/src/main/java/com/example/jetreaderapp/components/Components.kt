@@ -315,7 +315,7 @@ fun ListCard(
                         contentDescription = "Fav Icon",
                         modifier = Modifier.padding(1.dp)
                     )
-                    BookRating(score = 3.5)
+                    BookRating(score = book.rating!!)
                 }
             }
             Text(
