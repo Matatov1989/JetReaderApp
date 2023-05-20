@@ -1,6 +1,8 @@
 package com.example.jetreaderapp.screens.update
 
 import android.annotation.SuppressLint
+import android.os.health.TimerStat
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,9 +34,12 @@ import coil.compose.rememberImagePainter
 import com.example.jetreaderapp.components.InputField
 import com.example.jetreaderapp.components.RatingBar
 import com.example.jetreaderapp.components.ReaderAppBar
+import com.example.jetreaderapp.components.RoundedButton
 import com.example.jetreaderapp.data.DataOrException
 import com.example.jetreaderapp.model.MBook
 import com.example.jetreaderapp.screens.home.HomeScreenViewModel
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "ProduceStateDoesNotAssignValue")
@@ -145,7 +150,10 @@ fun ShowSimpleForm(book: MBook, navController: NavController) {
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
-        TextButton(onClick = { isFinishedReading.value = true }, enabled = book.finishedReading == null) {
+        TextButton(
+            onClick = { isFinishedReading.value = true },
+            enabled = book.finishedReading == null
+        ) {
             if (book.finishedReading == null) {
                 if (!isFinishedReading.value) {
                     Text(text = "Mark as Read")
@@ -157,12 +165,50 @@ fun ShowSimpleForm(book: MBook, navController: NavController) {
             }
         }
     }
-    
+
     Text(text = "Rating", modifier = Modifier.padding(3.dp))
     book.rating?.toInt().let {
         RatingBar(reting = it!!) { rating ->
             ratingVal.value = rating
         }
+    }
+
+    Spacer(modifier = Modifier.padding(bottom = 15.dp))
+    Row {
+
+        val changedNotes = book.notes != notesText.value
+        val changedRating = book.rating?.toInt() != ratingVal.value
+        val isFinishedTimeStamp =
+            if (isFinishedReading.value) Timestamp.now() else book.finishedReading
+        val isStartedTimeStamp =
+            if (isStartReading.value) Timestamp.now() else book.startedReading
+
+        val bookUpdate =
+            changedNotes || changedRating || isStartReading.value || isFinishedReading.value
+
+        val bookToUpdate = hashMapOf(
+            "finished_reading_at" to isFinishedTimeStamp,
+            "started_reading_at" to isStartedTimeStamp,
+            "rating" to ratingVal.value,
+            "notes" to notesText.value
+        ).toMap()
+
+        RoundedButton(label = "Update") {
+            if (bookUpdate) {
+                FirebaseFirestore.getInstance()
+                    .collection("books")
+                    .document(book.id!!)
+                    .update(bookToUpdate)
+                    .addOnCompleteListener {
+
+                    }
+                    .addOnFailureListener {
+                        Log.w("Error", "Error updating document", it)
+                    }
+            }
+        }
+        Spacer(modifier = Modifier.width(100.dp))
+        RoundedButton(label = "Delete")
     }
 
 }
