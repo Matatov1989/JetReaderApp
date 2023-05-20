@@ -10,10 +10,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.sharp.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,6 +29,7 @@ import com.example.jetreaderapp.model.MBook
 import com.example.jetreaderapp.navigation.ReaderScreens
 import com.example.jetreaderapp.screens.home.HomeScreenViewModel
 import com.example.jetreaderapp.screens.search.BookRow
+import com.example.jetreaderapp.utils.formatDate
 import com.google.firebase.auth.FirebaseAuth
 import java.util.*
 
@@ -71,23 +74,34 @@ fun ReaderStatsScreen(
                     ) {
                         Icon(imageVector = Icons.Sharp.Person, contentDescription = "icon")
                     }
-                    Text(text = "Hi, ${currentUser?.email.toString().split("@")[0].uppercase(Locale.getDefault())}")
+                    Text(
+                        text = "Hi, ${
+                            currentUser?.email.toString()
+                                .split("@")[0].uppercase(Locale.getDefault())
+                        }"
+                    )
                 }
-                Card(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp), shape = CircleShape, elevation = 5.dp) {
-                    val readBooksList: List<MBook> = if (!viewModel.data.value.data.isNullOrEmpty()) {
-                        books.filter { mBook ->
-                            mBook.userId == currentUser?.uid && mBook.finishedReading != null
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp), shape = CircleShape, elevation = 5.dp
+                ) {
+                    val readBooksList: List<MBook> =
+                        if (!viewModel.data.value.data.isNullOrEmpty()) {
+                            books.filter { mBook ->
+                                mBook.userId == currentUser?.uid && mBook.finishedReading != null
+                            }
+                        } else {
+                            emptyList()
                         }
-                    } else {
-                        emptyList()
-                    }
                     val readingBooks = books.filter { mBook ->
                         mBook.startedReading != null && mBook.finishedReading == null
                     }
 
-                    Column(modifier = Modifier.padding(start = 25.dp, top = 4.dp, bottom = 4.dp), horizontalAlignment = Alignment.Start) {
+                    Column(
+                        modifier = Modifier.padding(start = 25.dp, top = 4.dp, bottom = 4.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
                         Text(text = "Your Stats", style = MaterialTheme.typography.h5)
                         Divider()
                         Text(text = "You're reading: ${readingBooks.size} books")
@@ -98,17 +112,20 @@ fun ReaderStatsScreen(
                     LinearProgressIndicator()
                 } else {
                     Divider()
-                    LazyColumn(modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(), contentPadding = PaddingValues(16.dp)) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(), contentPadding = PaddingValues(16.dp)
+                    ) {
                         // filter books by finished ones
-                        val readBooks: List<MBook> = if (!viewModel.data.value.data.isNullOrEmpty()) {
-                            viewModel.data.value.data!!.filter { mBook ->
-                                mBook.userId == currentUser?.uid && mBook.finishedReading != null
+                        val readBooks: List<MBook> =
+                            if (!viewModel.data.value.data.isNullOrEmpty()) {
+                                viewModel.data.value.data!!.filter { mBook ->
+                                    mBook.userId == currentUser?.uid && mBook.finishedReading != null
+                                }
+                            } else {
+                                emptyList()
                             }
-                        } else {
-                            emptyList()
-                        }
                         items(items = readBooks) { book ->
                             BookRowStats(book = book)
                         }
@@ -148,7 +165,21 @@ fun BookRowStats(book: MBook) {
                     .padding(end = 4.dp)
             )
             Column() {
-                Text(text = book.title.toString(), overflow = TextOverflow.Ellipsis)
+
+                Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = book.title.toString(), overflow = TextOverflow.Ellipsis)
+                    if (book.rating!! >= 4) {
+                        Spacer(modifier = Modifier.fillMaxWidth(0.8f))
+                        Icon(
+                            imageVector = Icons.Default.ThumbUp,
+                            contentDescription = "Thumb up",
+                            tint = Color.Green.copy(alpha = 0.5f)
+                        )
+                    } else {
+                        Box {}
+                    }
+                }
+
                 Text(
                     text = "Author: ${book.author}",
                     overflow = TextOverflow.Clip,
@@ -157,14 +188,15 @@ fun BookRowStats(book: MBook) {
                 )
 
                 Text(
-                    text = "Date: ${book.publishedDate}",
+                    text = "Started: ${formatDate(book.startedReading!!)}",
+                    softWrap = true,
                     overflow = TextOverflow.Clip,
                     fontStyle = FontStyle.Italic,
                     style = MaterialTheme.typography.caption
                 )
 
                 Text(
-                    text = "${book.categories}",
+                    text = "Finished ${formatDate(book.finishedReading!!)}",
                     overflow = TextOverflow.Clip,
                     fontStyle = FontStyle.Italic,
                     style = MaterialTheme.typography.caption
